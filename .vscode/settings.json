@@ -1,0 +1,6 @@
+{
+    "python.pythonPath": "C://Python38//python.exe",
+    "python.analysis.extraPaths": ["C://MAJOR_TING/be-sentiment-app"], 
+    "git.ignoreLimitWarning": true,
+    "jupyter.jupyterServerType": "local"
+}
