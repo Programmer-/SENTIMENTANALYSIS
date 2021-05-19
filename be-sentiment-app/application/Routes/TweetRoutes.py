@@ -1,16 +1,18 @@
-from flask_cors import cross_origin
-from datetime import timezone
-import datetime
-from dotenv import load_dotenv
-from os import environ, path
-import numpy
-import tweepy
-import json
-from ..helper.TweetClassifier import TweetClassifier
-from ..helper.encoder import AlchemyEncoder
-from ..Models.Tweet import db, Tweet
-from flask import current_app as app
+# import os
+# from google.cloud import translate_v2 as translate
 from flask import request, jsonify, escape
+from flask import current_app as app
+from ..Models.Tweet import db, Tweet
+from ..helper.encoder import AlchemyEncoder
+from ..helper.TweetClassifier import TweetClassifier
+import json
+import tweepy
+import numpy
+from os import environ, path
+from dotenv import load_dotenv
+import datetime
+from datetime import timezone
+from flask_cors import cross_origin
 
 
 basedir = path.abspath(path.dirname(path.dirname(path.dirname(__file__))))
@@ -82,8 +84,8 @@ def crawlTweet():
     classifier = TweetClassifier()
     hashtag = request.get_json()['hashtag']
     hashtag = "#"+hashtag
-    tweetsPerQry = 100
-    maxTweets = 300  # 1000000
+    tweetsPerQry = 1000
+    maxTweets = 10000  # 1000000
     authentication = tweepy.OAuthHandler(environ.get(
         "CONSUMER_KEY"), environ.get("CONSUMER_SECRET"))
     authentication.set_access_token(environ.get(
@@ -95,9 +97,9 @@ def crawlTweet():
     while tweetCount < maxTweets:
         if(maxId <= 0):
             newTweets = api.search(
-                q=hashtag, count=tweetsPerQry, result_type="recent", tweet_mode="extended")
+                q=hashtag, lang="en", count=tweetsPerQry, result_type="recent", tweet_mode="extended")
         else:
-            newTweets = api.search(q=hashtag, count=tweetsPerQry, max_id=str(
+            newTweets = api.search(q=hashtag, lang="en", count=tweetsPerQry, max_id=str(
                 maxId - 1), result_type="recent", tweet_mode="extended")
 
         if not newTweets:
@@ -105,6 +107,20 @@ def crawlTweet():
             break
 
         val = []
+
+
+# os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = r'be-sentiment-app/application/helper/serveaccount.json'
+
+# # We specify the path to the file we want to load
+
+# filepath = r''
+
+# # Instantiate the Google Translation API Client
+#         translate_client = translate.Client()
+#         newTweets = translate_client.translate(Tweet,
+#                                            target_language='en'
+#                                            )
+
         for tweet in newTweets:
             id = tweet.id
             id = str(id)
